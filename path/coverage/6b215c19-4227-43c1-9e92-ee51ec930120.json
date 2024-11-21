@@ -1,0 +1,91 @@
+{
+  "scriptId": "314",
+  "url": "file:///C:/Users/GiovanniPatruno/repos/personal/mosaico/path/mod_test.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 3224, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "bezierCurveTest",
+      "ranges": [{ "startOffset": 121, "endOffset": 291, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "moveToTest",
+      "ranges": [{ "startOffset": 312, "endOffset": 414, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "lineToTest",
+      "ranges": [{ "startOffset": 435, "endOffset": 539, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "circleTest",
+      "ranges": [{ "startOffset": 560, "endOffset": 748, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "circleInSquareTest",
+      "ranges": [{ "startOffset": 777, "endOffset": 1016, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "quadraticCurveTest",
+      "ranges": [{ "startOffset": 1045, "endOffset": 1208, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcTestClockwise",
+      "ranges": [{ "startOffset": 1235, "endOffset": 1388, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcTestCounterClockwise",
+      "ranges": [{ "startOffset": 1422, "endOffset": 1574, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcToTest",
+      "ranges": [{ "startOffset": 1594, "endOffset": 1850, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "longXDistanceTest",
+      "ranges": [{ "startOffset": 1878, "endOffset": 2164, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcNegativeRadius",
+      "ranges": [{ "startOffset": 2192, "endOffset": 2333, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 2242, "endOffset": 2304, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcToNegativeRadius",
+      "ranges": [{ "startOffset": 2363, "endOffset": 2500, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 2413, "endOffset": 2472, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcRadiusZero",
+      "ranges": [{ "startOffset": 2524, "endOffset": 2653, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcToNostartTest",
+      "ranges": [{ "startOffset": 2680, "endOffset": 2829, "count": 1 }],
+      "isBlockCoverage": true
+    }
+  ]
+}

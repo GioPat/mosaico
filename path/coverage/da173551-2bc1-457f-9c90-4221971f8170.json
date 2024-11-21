@@ -1,0 +1,90 @@
+{
+  "scriptId": "316",
+  "url": "file:///C:/Users/GiovanniPatruno/repos/personal/mosaico/path/mod.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 3986, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createPath",
+      "ranges": [{ "startOffset": 309, "endOffset": 3984, "count": 14 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "moveTo",
+      "ranges": [{ "startOffset": 527, "endOffset": 622, "count": 7 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "quadraticCurveTo",
+      "ranges": [{ "startOffset": 944, "endOffset": 1041, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "bezierCurveTo",
+      "ranges": [{ "startOffset": 1067, "endOffset": 1198, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arcTo",
+      "ranges": [
+        { "startOffset": 1216, "endOffset": 2407, "count": 2 },
+        { "startOffset": 1271, "endOffset": 1285, "count": 1 },
+        { "startOffset": 1287, "endOffset": 1436, "count": 1 },
+        { "startOffset": 1436, "endOffset": 1491, "count": 0 },
+        { "startOffset": 1491, "endOffset": 1666, "count": 1 },
+        { "startOffset": 1666, "endOffset": 1687, "count": 0 },
+        { "startOffset": 1687, "endOffset": 2403, "count": 1 },
+        { "startOffset": 1751, "endOffset": 1844, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "arc",
+      "ranges": [
+        { "startOffset": 2423, "endOffset": 3443, "count": 8 },
+        { "startOffset": 2498, "endOffset": 2558, "count": 2 },
+        { "startOffset": 2558, "endOffset": 2686, "count": 6 },
+        { "startOffset": 2686, "endOffset": 2689, "count": 2 },
+        { "startOffset": 2690, "endOffset": 2693, "count": 4 },
+        { "startOffset": 2722, "endOffset": 2745, "count": 2 },
+        { "startOffset": 2746, "endOffset": 2769, "count": 4 },
+        { "startOffset": 2792, "endOffset": 2955, "count": 3 },
+        { "startOffset": 2873, "endOffset": 2910, "count": 2 },
+        { "startOffset": 2889, "endOffset": 2893, "count": 0 },
+        { "startOffset": 2912, "endOffset": 2955, "count": 1 },
+        { "startOffset": 2955, "endOffset": 2978, "count": 6 },
+        { "startOffset": 2978, "endOffset": 2999, "count": 1 },
+        { "startOffset": 2999, "endOffset": 3016, "count": 5 },
+        { "startOffset": 3016, "endOffset": 3050, "count": 2 },
+        { "startOffset": 3050, "endOffset": 3076, "count": 5 },
+        { "startOffset": 3076, "endOffset": 3229, "count": 2 },
+        { "startOffset": 3229, "endOffset": 3427, "count": 3 },
+        { "startOffset": 3427, "endOffset": 3442, "count": 5 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "lineTo",
+      "ranges": [{ "startOffset": 3462, "endOffset": 3533, "count": 4 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "rect",
+      "ranges": [{ "startOffset": 3550, "endOffset": 3680, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "closePath",
+      "ranges": [{ "startOffset": 3702, "endOffset": 3795, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "toString",
+      "ranges": [{ "startOffset": 3816, "endOffset": 3842, "count": 12 }],
+      "isBlockCoverage": true
+    }
+  ]
+}
