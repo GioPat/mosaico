@@ -68,6 +68,17 @@ const arcToTest = () => {
   );
 };
 
+const arcToTestTrimmed = () => {
+  const path = createPath(3);
+  path.moveTo(10, 10);
+  path.lineTo(100, 10);
+  path.arcTo(150, 150, 300, 10, 40);
+  assertEquals(
+    path.toString(),
+    "M10,10L100,10L129.53,92.684A40,40,0,0,0,194.492,108.473",
+  );
+};
+
 const longXDistanceTest = () => {
   const path = createPath();
   path.moveTo(10, 10);
@@ -110,6 +121,7 @@ const arcToNostartTest = () => {
 Deno.test(moveToTest);
 Deno.test(lineToTest);
 Deno.test(arcToTest);
+Deno.test(arcToTestTrimmed);
 Deno.test(arcNegativeRadius);
 Deno.test(arcToNegativeRadius);
 Deno.test(arcRadiusZero);

@@ -10,16 +10,38 @@ const pi = Math.PI,
   epsilon = 1e-6,
   tauEpsilon = tau - epsilon;
 
+interface TrimDigit {
+  (number: number, mul?: number): number;
+}
+
+const trim: TrimDigit = (
+  number: number,
+  mul?: number,
+): number => {
+  return Math.floor(number * mul!) / mul!;
+};
+
+const notTrim: TrimDigit = (
+  number: number,
+  _?: number,
+): number => {
+  return number;
+};
+
 /**
  * returns a path object that allows you to create a path based on the [W3 path API](https://www.w3.org/TR/SVG/paths.htm).
  * @returns {Object} path
  */
-export const createPath = () => {
+export const createPath = (digits?: number) => {
   let x0: number | null = null,
     x1: number | null = null,
     y0: number | null = null,
     y1: number | null = null;
   let path: string = "";
+  const mul = Math.pow(10, digits ?? 0);
+  const trimDigit: (number: number) => number = digits !== undefined
+    ? (number: number) => trim(number, mul)
+    : notTrim;
 
   /**
    * Move to the specified point (x, y) without drawing a line.
@@ -31,7 +53,7 @@ export const createPath = () => {
     x1 = x;
     y0 = y;
     y1 = y;
-    path = `${path}M${x0},${y0}`;
+    path = `${path}M${trimDigit(x0)},${trimDigit(y0)}`;
   };
 
   /**
@@ -49,7 +71,9 @@ export const createPath = () => {
   ): void => {
     x1 = x;
     y1 = y;
-    path = `${path}Q${+cpx},${+cpy},${x1},${y1}`;
+    path = `${path}Q${trimDigit(cpx)},${trimDigit(cpy)},${trimDigit(x1)},${
+      trimDigit(y1)
+    }`;
   };
 
   /**
@@ -71,7 +95,9 @@ export const createPath = () => {
   ): void => {
     x1 = x;
     y1 = y;
-    path = `${path}C${+cp1x},${+cp1y},${+cp2x},${+cp2y},${x1},${y1}`;
+    path = `${path}C${trimDigit(cp1x)},${trimDigit(cp1y)},${trimDigit(cp2x)},${
+      trimDigit(cp2y)
+    },${trimDigit(x1)},${trimDigit(y1)}`;
   };
 
   /**
@@ -96,7 +122,7 @@ export const createPath = () => {
       y1 = y1Arc;
       x0 = x0 ?? 0;
       y0 = y0 ?? 0;
-      path = `${path}M${x1},${y1}`;
+      path = `${path}M${trimDigit(x1)},${trimDigit(y1)}`;
       return;
     }
     if (r < 0) {
@@ -114,7 +140,7 @@ export const createPath = () => {
     else if (Math.abs(y01 * x21 - y21 * x01) < epsilon || r === 0) {
       x1 = x1Arc;
       y1 = y1Arc;
-      path = `${path}L${x1},${y1}`;
+      path = `${path}L${trimDigit(x1)},${trimDigit(y1)}`;
       return;
     } else {
       const x20 = x2Arc - x0Arc,
@@ -130,11 +156,15 @@ export const createPath = () => {
         t01 = l / l01,
         t21 = l / l21;
       if (Math.abs(t01 - 1) > epsilon) {
-        path = `${path}L${x1Arc + t01 * x01},${y1Arc + t01 * y01}`;
+        path = `${path}L${trimDigit(x1Arc + t01 * x01)},${
+          trimDigit(y1Arc + t01 * y01)
+        }`;
       }
       x1 = x1Arc + t21 * x21;
       y1 = y1Arc + t21 * y21;
-      path = `${path}A${r},${r},0,0,${+(y01 * x20 > x01 * y20)},${x1},${y1}`;
+      path = `${path}A${trimDigit(r)},${
+        trimDigit(r)
+      },0,0,${+(y01 * x20 > x01 * y20)},${trimDigit(x1)},${trimDigit(y1)}`;
       return;
     }
   };
@@ -172,7 +202,7 @@ export const createPath = () => {
     } else if (
       Math.abs(x1 - x0) > epsilon || Math.abs((y1 ?? 0) - y0) > epsilon
     ) {
-      path = `${path}L${x0},${y0}`;
+      path = `${path}L${trimDigit(x0)},${trimDigit(y0)}`;
     }
 
     if (radius === 0) return;
@@ -184,13 +214,17 @@ export const createPath = () => {
     if (da > tauEpsilon) {
       x1 = x0;
       y1 = y0;
-      path = `${path}A${radius},${radius},0,1,${cw},${x - dx},${
-        y - dy
-      }A${radius},${radius},0,1,${cw},${x1},${y1}`;
+      path = `${path}A${trimDigit(radius)},${trimDigit(radius)},0,1,${cw},${
+        trimDigit(x - dx)
+      },${trimDigit(y - dy)}A${trimDigit(radius)},${
+        trimDigit(radius)
+      },0,1,${cw},${trimDigit(x1)},${trimDigit(y1)}`;
     } else if (da > epsilon) {
       x1 = x + radius * Math.cos(endAngle);
       y1 = y + radius * Math.sin(endAngle);
-      path = `${path}A${radius},${radius},0,${+(da >= pi)},${cw},${x1},${y1}`;
+      path = `${path}A${trimDigit(radius)},${
+        trimDigit(radius)
+      },0,${+(da >= pi)},${cw},${trimDigit(x1)},${trimDigit(y1)}`;
     }
     return;
   };
@@ -203,7 +237,7 @@ export const createPath = () => {
   const lineTo = (x: number, y: number): void => {
     x1 = x;
     y1 = y;
-    path = `${path}L${x1},${y1}`;
+    path = `${path}L${trimDigit(x1)},${trimDigit(y1)}`;
   };
 
   /**
@@ -217,7 +251,9 @@ export const createPath = () => {
     y0 = y;
     y1 = y;
 
-    path = `${path}M${x0},${y0}h${w}v${h}h${-w}Z`;
+    path = `${path}M${trimDigit(x0)},${trimDigit(y0)}h${trimDigit(w)}v${
+      trimDigit(h)
+    }h${trimDigit(-w)}Z`;
     return;
   };
 
