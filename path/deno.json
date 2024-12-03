@@ -1,5 +1,5 @@
 {
-  "name": "@d3no-charts/path",
+  "name": "@mosaico/path",
   "version": "0.1.0",
   "exports": "./mod.ts",
   "tasks": {

@@ -29,10 +29,134 @@ const notTrim: TrimDigit = (
 };
 
 /**
+ * Path object that allows you to create SVG path based. It implements the [CanvasRenderingContext2D API](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D).
+ * This allow you to create both SVGs and Canvas paths.
+ */
+export type Path = {
+  /**
+   * Move to the specified point (x, y) without drawing a line.
+   * @param x Coordinate x
+   * @param y Coordinate y
+   */
+  moveTo: (x: number, y: number) => void;
+
+  /**
+   * Adds to the path a line segment from the current point to the point (x, y).
+   * @param x Coordinate x
+   * @param y Coordinate y
+   */
+  lineTo: (x: number, y: number) => void;
+
+  /**
+   * Adds to the path a quadratic Bézier curve from the current point to (x,y) using (x1,y1) as the control point.
+   * @param cpx Control point x
+   * @param cpy Control point y
+   * @param x Coordinate x
+   * @param y Coordinate y
+   */
+  quadraticCurveTo: (cpx: number, cpy: number, x: number, y: number) => void;
+
+  /**
+   * Adds to the path a cubic Bézier curve from the current point to (x,y) using (cp1x,cp1y) and (cp2x,cp2y) as control points.
+   * @param cp1x Control point 1 x
+   * @param cp1y Control point 1 y
+   * @param cp2x Control point 2 x
+   * @param cp2y Control point 2 y
+   * @param x Coordinate x
+   * @param y Coordinate y
+   */
+  bezierCurveTo: (
+    cp1x: number,
+    cp1y: number,
+    cp2x: number,
+    cp2y: number,
+    x: number,
+    y: number,
+  ) => void;
+
+  /**
+   * Adds to the path an arc with the specified control points and radius
+   * @param x1Arc Coordinate x of the first control point
+   * @param y1Arc Coordinate y of the first control point
+   * @param x2Arc Coordinate x of the second control point
+   * @param y2Arc Coordinate y of the second control point
+   * @param r Radius of the arc
+   * @throws {Error} negative radius
+   * @returns void
+   */
+  arcTo: (
+    x1Arc: number,
+    y1Arc: number,
+    x2Arc: number,
+    y2Arc: number,
+    r: number,
+  ) => void;
+
+  /**
+   * @param x Relative coordinate x for the center of the circle
+   * @param y Relative coordinate y for the center of the circle
+   * @param radius Radius of the circle
+   * @param clockwise If true, draws the circle clockwise, otherwise counter-clockwise, this is useful for creating donut and have a correct fill behavior.
+   * @returns
+   */
+  circle: (
+    x: number,
+    y: number,
+    radius: number,
+    clockwise: boolean,
+  ) => void;
+
+  /**
+   * Adds to the path a circular arc segment with the specified center ⟨x, y⟩, radius, startAngle and endAngle. If anticlockwise is true, the arc is drawn in the anticlockwise direction; otherwise, it is drawn in the clockwise direction. If the current point is not equal to the starting point of the arc, a straight line is drawn from the current point to the start of the arc.
+   * @param x Coordinate x
+   * @param y Coordinate y
+   * @param radius Radius of the arc
+   * @param startAngle Start angle of the arc
+   * @param endAngle End angle of the arc
+   * @param anticlockwise If true, draws the arc counter-clockwise between the start and end angles, otherwise clockwise
+   * @throws {Error} negative radius
+   * @returns void
+   */
+  arc: (
+    x: number,
+    y: number,
+    radius: number,
+    startAngle: number,
+    endAngle: number,
+    anticlockwise: boolean,
+  ) => void;
+
+  /**
+   * Adds to the path a line segment from the current point to the point (x, y).
+   * @param x Coordinate x
+   * @param y Coordinate y
+   */
+  rect: (x: number, y: number, w: number, h: number) => void;
+
+  /**
+   * Adds the given path to this path.
+   * @param raw Path data string
+   */
+  addRaw: (raw: string) => void;
+
+  /**
+   * Closes the path, joining the last point with the first point (if
+   * they are different) with a straight line.
+   */
+  closePath: () => void;
+
+  /**
+   * Returns the path data string.
+   * @returns {string} path
+   */
+  toString: () => string;
+};
+
+/**
  * returns a path object that allows you to create a path based on the [W3 path API](https://www.w3.org/TR/SVG/paths.htm).
  * @returns {Object} path
  */
-export const createPath = (digits?: number) => {
+export const createPath = (digits?: number): Path => {
   let x0: number | null = null,
     x1: number | null = null,
     y0: number | null = null,
@@ -43,26 +167,14 @@ export const createPath = (digits?: number) => {
     ? (number: number) => trim(number, mul)
     : notTrim;
 
-  /**
-   * Move to the specified point (x, y) without drawing a line.
-   * @param x Coordinate x
-   * @param y Coordinate y
-   */
   const moveTo = (x: number, y: number): void => {
     x0 = x;
     x1 = x;
     y0 = y;
     y1 = y;
-    path = `${path}M${trimDigit(x0)},${trimDigit(y0)}`;
+    path = `${path}M${trimDigit(x0)} ${trimDigit(y0)}`;
   };
 
-  /**
-   * Adds to the path a quadratic Bézier curve from the current point to (x,y) using (x1,y1) as the control point.
-   * @param cpx Control point x
-   * @param cpy Control point y
-   * @param x Coordinate x
-   * @param y Coordinate y
-   */
   const quadraticCurveTo = (
     cpx: number,
     cpy: number,
@@ -76,15 +188,6 @@ export const createPath = (digits?: number) => {
     }`;
   };
 
-  /**
-   * Adds to the path a cubic Bézier curve from the current point to (x,y) using (cp1x,cp1y) and (cp2x,cp2y) as control points.
-   * @param cp1x Control point 1 x
-   * @param cp1y Control point 1 y
-   * @param cp2x Control point 2 x
-   * @param cp2y Control point 2 y
-   * @param x Coordinate x
-   * @param y Coordinate y
-   */
   const bezierCurveTo = (
     cp1x: number,
     cp1y: number,
@@ -100,16 +203,6 @@ export const createPath = (digits?: number) => {
     },${trimDigit(x1)},${trimDigit(y1)}`;
   };
 
-  /**
-   * Adds to the path an arc with the specified control points and radius
-   * @param x1Arc Coordinate x of the first control point
-   * @param y1Arc Coordinate y of the first control point
-   * @param x2Arc Coordinate x of the second control point
-   * @param y2Arc Coordinate y of the second control point
-   * @param r Radius of the arc
-   * @throws {Error} negative radius
-   * @returns void
-   */
   const arcTo = (
     x1Arc: number,
     y1Arc: number,
@@ -122,7 +215,7 @@ export const createPath = (digits?: number) => {
       y1 = y1Arc;
       x0 = x0 ?? 0;
       y0 = y0 ?? 0;
-      path = `${path}M${trimDigit(x1)},${trimDigit(y1)}`;
+      path = `${path}M${trimDigit(x1)} ${trimDigit(y1)}`;
       return;
     }
     if (r < 0) {
@@ -156,7 +249,7 @@ export const createPath = (digits?: number) => {
         t01 = l / l01,
         t21 = l / l21;
       if (Math.abs(t01 - 1) > epsilon) {
-        path = `${path}L${trimDigit(x1Arc + t01 * x01)},${
+        path = `${path}L${trimDigit(x1Arc + t01 * x01)} ${
           trimDigit(y1Arc + t01 * y01)
         }`;
       }
@@ -169,17 +262,23 @@ export const createPath = (digits?: number) => {
     }
   };
 
-  /**
-   * Adds to the path a circular arc segment with the specified center ⟨x, y⟩, radius, startAngle and endAngle. If anticlockwise is true, the arc is drawn in the anticlockwise direction; otherwise, it is drawn in the clockwise direction. If the current point is not equal to the starting point of the arc, a straight line is drawn from the current point to the start of the arc.
-   * @param x Coordinate x
-   * @param y Coordinate y
-   * @param radius Radius of the arc
-   * @param startAngle Start angle of the arc
-   * @param endAngle End angle of the arc
-   * @param anticlockwise If true, draws the arc counter-clockwise between the start and end angles, otherwise clockwise
-   * @throws {Error} negative radius
-   * @returns void
-   */
+  // Relative circle
+  const circle = (
+    x: number,
+    y: number,
+    radius: number,
+    clockwise: boolean,
+  ): void => {
+    const halfRadius = radius / 2;
+    const cw = clockwise ? 1 : 0;
+    path = `${path}m${x} ${y} a${trimDigit(halfRadius)} ${
+      trimDigit(halfRadius)
+    } 0 0${cw}${radius} 0 ${trimDigit(halfRadius)} ${
+      trimDigit(halfRadius)
+    } 0 0${cw}${-trimDigit(radius)} 0`;
+    return;
+  };
+
   const arc = (
     x: number,
     y: number,
@@ -198,11 +297,11 @@ export const createPath = (digits?: number) => {
       cw = anticlockwise ? 0 : 1;
     let da = anticlockwise ? startAngle - endAngle : endAngle - startAngle;
     if (x1 === null) {
-      path = `${path}M${x0},${y0}`;
+      path = `${path}M${x0} ${y0}`;
     } else if (
       Math.abs(x1 - x0) > epsilon || Math.abs((y1 ?? 0) - y0) > epsilon
     ) {
-      path = `${path}L${trimDigit(x0)},${trimDigit(y0)}`;
+      path = `${path}L${trimDigit(x0)} ${trimDigit(y0)}`;
     }
 
     if (radius === 0) return;
@@ -229,38 +328,28 @@ export const createPath = (digits?: number) => {
     return;
   };
 
-  /**
-   * Adds to the path a line segment from the current point to the point (x, y).
-   * @param x Coordinate x
-   * @param y Coordinate y
-   */
   const lineTo = (x: number, y: number): void => {
     x1 = x;
     y1 = y;
-    path = `${path}L${trimDigit(x1)},${trimDigit(y1)}`;
+    path = `${path}L${trimDigit(x1)} ${trimDigit(y1)}`;
   };
 
-  /**
-   * Adds to the path a line segment from the current point to the point (x, y).
-   * @param x Coordinate x
-   * @param y Coordinate y
-   */
   const rect = (x: number, y: number, w: number, h: number) => {
     x0 = x;
     x1 = x;
     y0 = y;
     y1 = y;
 
-    path = `${path}M${trimDigit(x0)},${trimDigit(y0)}h${trimDigit(w)}v${
+    path = `${path}M${trimDigit(x0)} ${trimDigit(y0)}h${trimDigit(w)}v${
       trimDigit(h)
     }h${trimDigit(-w)}Z`;
     return;
   };
 
-  /**
-   * Closes the path, joining the last point with the first point (if
-   * they are different) with a straight line.
-   */
+  const addRaw = (raw: string): void => {
+    path = `${path}${raw}`;
+  };
+
   const closePath = (): void => {
     if (x1 !== null) {
       x1 = x0;
@@ -269,10 +358,6 @@ export const createPath = (digits?: number) => {
     }
   };
 
-  /**
-   * Returns the path data string.
-   * @returns {string} path
-   */
   const toString = (): string => {
     return path;
   };
@@ -285,7 +370,9 @@ export const createPath = (digits?: number) => {
     arcTo,
     arc,
     rect,
+    addRaw,
     closePath,
     toString,
+    circle,
   };
 };

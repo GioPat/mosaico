@@ -1,8 +1,11 @@
 # Mosaico
 
-Mosaico (From the Italian translation of Mosaic) is a charting library
-**heavily** inspired by [D3js](https://github.com/d3) but built on new standards
-(native typescript, workspaces, etc.).
+Mosaico (From the Italian translation of Mosaic) is a charting library inspired
+by [D3js](https://github.com/d3) but built on new standards (native typescript,
+workspaces, etc.), and with a focus on:
+
+- atomocity instead of having a single interface to do everything.
+- New web standards (SVG 2.0 and new Canvas Rendering capabilities).
 
 ## Key differences from D3js
 
