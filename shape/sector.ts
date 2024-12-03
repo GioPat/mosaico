@@ -88,30 +88,33 @@ export const sector = (params: SectorInitParams): Sector => {
         }
         case !innerRadius && outerCornerRadius !== undefined: {
           // It's a slice with rounded outer corners
-          const offsetOuterRadius = outerRadius - outerCornerRadius;
+          const center: Point = { x: 0, y: -outerRadius };
+          const actualCornerOuterRadius = Math.min(outerRadius / 2, outerCornerRadius);
+          const outerRadiusIncludingBorder = outerRadius - actualCornerOuterRadius;
           const startAnglePadded = startAngle + (padAngle ?? 0 / 2);
           const endAnglePadded = endAngle - (padAngle ?? 0 / 2);
-          // Compute and move to the start point of the outer arc
-          const outerBorderArcStart = pointOnArc(
-            { x: 0, y: 0 },
-            offsetOuterRadius,
-            startAnglePadded + (padAngle ?? 0 / 2),
+
+          const outerRoundingAngle = 360 * ((actualCornerOuterRadius ?? 0) / (2 * Math.PI * outerRadius));
+          const outerArcStart = pointOnArc(center, outerRadius, startAnglePadded + outerRoundingAngle);
+          const outerArcEnd = pointOnArc(center, outerRadius, endAnglePadded - outerRoundingAngle);
+
+          const outerStart = pointOnArc(center, outerRadiusIncludingBorder, startAnglePadded);
+          const outerEnd = pointOnArc(center, outerRadiusIncludingBorder, endAnglePadded);
+
+          const outerSweep = angleSpan > 180 + 2 * outerRoundingAngle;
+          path.moveTo(0, -outerRadius);
+          path.lineTo(outerStart.x, outerStart.y);
+          path.arcRaw(
+            actualCornerOuterRadius,
+            actualCornerOuterRadius,
+            0,
+            false,
+            true,
+            outerArcStart.x,
+            outerArcStart.y,
           );
-          path.moveTo(outerBorderArcStart.x, outerBorderArcStart.y);
-
-          // Compute the end and creates Arc for the top rounded corner
-          const outerBorderAngle = 360 * (outerCornerRadius / (2 * Math.PI * outerRadius));
-          const outerBorderArcEnd = pointOnArc({ x: 0, y: 0 }, outerRadius, startAnglePadded + outerBorderAngle);
-          path.arcRaw(outerRadius, outerRadius, 0, true, true, outerBorderArcEnd.x, outerBorderArcEnd.y);
-          path.arcRaw(outerCornerRadius, outerCornerRadius, 0, false, true, outerBorderArcEnd.x, outerBorderArcEnd.y);
-
-          // Compute the end point of the main arc minus the border and creates the main arc
-          const mainArcSweep = angleSpan > 180 + 2 * outerBorderAngle;
-          const outerPaddedArcEnd = pointOnArc({ x: 0, y: 0 }, outerRadius, endAnglePadded - outerBorderAngle);
-          path.arcRaw(outerRadius, outerRadius, 0, mainArcSweep, true, outerPaddedArcEnd.x, outerPaddedArcEnd.y);
-          // Compute the end point of the main arc including the border and creates the bottom rounded corner
-          const outerArcEnd = pointOnArc({ x: 0, y: 0 }, offsetOuterRadius, endAnglePadded);
-          path.arcRaw(outerCornerRadius, outerCornerRadius, 0, false, true, outerArcEnd.x, outerArcEnd.y);
+          path.arcRaw(outerRadius, outerRadius, 0, outerSweep, true, outerArcEnd.x, outerArcEnd.y);
+          path.arcRaw(actualCornerOuterRadius, actualCornerOuterRadius, 0, false, true, outerEnd.x, outerEnd.y);
           break;
         }
         case innerRadius !== undefined && !outerCornerRadius &&
@@ -134,21 +137,28 @@ export const sector = (params: SectorInitParams): Sector => {
         case innerRadius !== undefined && outerRadius !== undefined &&
           (innerCornerRadius !== undefined ||
             outerCornerRadius !== undefined): {
-          const center: Point = { x: 0, y: 0 };
           // It's an annular sector with rounded corners
+          const actualCornerInnerRadius = innerCornerRadius
+            ? Math.min((outerRadius - innerRadius) / 2, innerCornerRadius)
+            : undefined;
+          const actualCornerOuterRadius = outerCornerRadius
+            ? Math.min((outerRadius - innerRadius) / 2, outerCornerRadius)
+            : undefined;
+
+          const center: Point = { x: 0, y: 0 };
           const startAnglePadded = startAngle + (padAngle ?? 0 / 2);
           const endAnglePadded = endAngle - (padAngle ?? 0 / 2);
 
-          const innerRadiusIncludingBorder = innerRadius + (innerCornerRadius ?? 0);
-          const outerRadiusIncludingBorder = outerRadius - (outerCornerRadius ?? 0);
+          const innerRadiusIncludingBorder = innerRadius + (actualCornerInnerRadius ?? 0);
+          const outerRadiusIncludingBorder = outerRadius - (actualCornerInnerRadius ?? 0);
           // These already take into account the border
           const outerStart = pointOnArc(center, outerRadiusIncludingBorder, startAnglePadded);
           const outerEnd = pointOnArc(center, outerRadiusIncludingBorder, endAnglePadded);
           const innerStart = pointOnArc(center, innerRadiusIncludingBorder, startAnglePadded);
           const innerEnd = pointOnArc(center, innerRadiusIncludingBorder, endAnglePadded);
 
-          const innerRoundingAngle = 360 * ((innerCornerRadius ?? 0) / (2 * Math.PI * innerRadius));
-          const outerRoundingAngle = 360 * ((outerCornerRadius ?? 0) / (2 * Math.PI * outerRadius));
+          const innerRoundingAngle = 360 * ((actualCornerInnerRadius ?? 0) / (2 * Math.PI * innerRadius));
+          const outerRoundingAngle = 360 * ((actualCornerOuterRadius ?? 0) / (2 * Math.PI * outerRadius));
 
           const innerArcStart = pointOnArc(center, innerRadius, startAnglePadded + innerRoundingAngle);
           const innerArcEnd = pointOnArc(center, innerRadius, endAnglePadded - innerRoundingAngle);
@@ -158,20 +168,28 @@ export const sector = (params: SectorInitParams): Sector => {
           const outerSweep = angleSpan > 180 + 2 * outerRoundingAngle;
           const innerSweep = angleSpan > 180 + 2 * innerRoundingAngle;
           path.moveTo(outerStart.x, outerStart.y);
-          if (outerCornerRadius) {
-            path.arcRaw(outerCornerRadius, outerCornerRadius, 0, false, true, outerArcStart.x, outerArcStart.y);
+          if (actualCornerOuterRadius) {
+            path.arcRaw(
+              actualCornerOuterRadius,
+              actualCornerOuterRadius,
+              0,
+              false,
+              true,
+              outerArcStart.x,
+              outerArcStart.y,
+            );
           }
           path.arcRaw(outerRadius, outerRadius, 0, outerSweep, true, outerArcEnd.x, outerArcEnd.y);
-          if (outerCornerRadius) {
-            path.arcRaw(outerCornerRadius, outerCornerRadius, 0, false, true, outerEnd.x, outerEnd.y);
+          if (actualCornerOuterRadius) {
+            path.arcRaw(actualCornerOuterRadius, actualCornerOuterRadius, 0, false, true, outerEnd.x, outerEnd.y);
           }
           path.lineTo(innerEnd.x, innerEnd.y);
-          if (innerCornerRadius) {
-            path.arcRaw(innerCornerRadius, innerCornerRadius, 0, false, true, innerArcEnd.x, innerArcEnd.y);
+          if (actualCornerInnerRadius) {
+            path.arcRaw(actualCornerInnerRadius, actualCornerInnerRadius, 0, false, true, innerArcEnd.x, innerArcEnd.y);
           }
           path.arcRaw(innerRadius, innerRadius, 0, innerSweep, false, innerArcStart.x, innerArcStart.y);
-          if (innerCornerRadius) {
-            path.arcRaw(innerCornerRadius, innerCornerRadius, 0, false, true, innerStart.x, innerStart.y);
+          if (actualCornerInnerRadius) {
+            path.arcRaw(actualCornerInnerRadius, actualCornerInnerRadius, 0, false, true, innerStart.x, innerStart.y);
           }
           break;
         }
