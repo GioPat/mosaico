@@ -134,10 +134,26 @@ export type Path = {
   rect: (x: number, y: number, w: number, h: number) => void;
 
   /**
-   * Adds the given path to this path.
-   * @param raw Path data string
+   * Adds the arc raw command to the path.
+   * @param radiusX The x-axis radius of the ellipse
+   * @param radiusY The y-axis radius of the ellipse
+   * @param xAxisRotation The rotation of the ellipse, in degrees
+   * @param largeArcFlag If true, draw the larger of the two possible arcs
+   * @param sweepFlag If true, draw the arc matching the direction of the path
+   * @param x Coordinate x
+   * @param y Coordinate y
+   * @param absolute If true, the coordinates are absolute, otherwise relative
    */
-  addRaw: (raw: string) => void;
+  arcRaw: (
+    radiusX: number,
+    radiusY: number,
+    xAxisRotation: number,
+    largeArcFlag: boolean,
+    sweepFlag: boolean,
+    x: number,
+    y: number,
+    absolute?: boolean,
+  ) => void;
 
   /**
    * Closes the path, joining the last point with the first point (if
@@ -346,8 +362,24 @@ export const createPath = (digits?: number): Path => {
     return;
   };
 
-  const addRaw = (raw: string): void => {
-    path = `${path}${raw}`;
+  const arcRaw = (
+    radiusX: number,
+    radiusY: number,
+    xAxisRotation: number,
+    largeArcFlag: boolean,
+    sweepFlag: boolean,
+    x: number,
+    y: number,
+    absolute: boolean = true,
+  ): void => {
+    const largeArcFlagValue = largeArcFlag ? 1 : 0;
+    const sweepFlagValue = sweepFlag ? 1 : 0;
+    const command = absolute ? "A" : "a";
+    path = `${path}${command}${trimDigit(radiusX)} ${
+      trimDigit(radiusY)
+    } ${xAxisRotation} ${largeArcFlagValue}${sweepFlagValue} ${trimDigit(x)} ${
+      trimDigit(y)
+    }`;
   };
 
   const closePath = (): void => {
@@ -370,7 +402,7 @@ export const createPath = (digits?: number): Path => {
     arcTo,
     arc,
     rect,
-    addRaw,
+    arcRaw,
     closePath,
     toString,
     circle,

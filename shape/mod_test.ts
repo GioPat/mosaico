@@ -3,12 +3,11 @@ import { sector } from "./sector.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test(function circle() {
-  const path = createPath();
+  const path = createPath(3);
   const s = sector({
-    startAngle: 45,
-    endAngle: 310,
-    outerRadius: 16,
-    innerRadius: 10,
+    startAngle: 200,
+    endAngle: 210,
+    outerRadius: 100,
   });
   s.draw(path);
   console.log(path.toString());
