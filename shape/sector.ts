@@ -81,9 +81,9 @@ export const sector = (params: SectorInitParams): Sector => {
           const startPoint = pointOnArc({ x: 0, y: -outerRadius }, outerRadius, startAnglePadded);
           path.lineTo(startPoint.x, startPoint.y);
           const sweep = angleSpan > 180;
+          const sweepMainArc = startAngle < endAngle;
           const endPoint = pointOnArc({ x: 0, y: -outerRadius }, outerRadius, endAnglePadded);
-          path.arcRaw(outerRadius, outerRadius, 0, sweep, true, endPoint.x, endPoint.y);
-          path.arcRaw(outerRadius, outerRadius, 0, sweep, true, endPoint.x, endPoint.y);
+          path.arcRaw(outerRadius, outerRadius, 0, sweep, sweepMainArc, endPoint.x, endPoint.y);
           break;
         }
         case !innerRadius && outerCornerRadius !== undefined: {
@@ -138,26 +138,44 @@ export const sector = (params: SectorInitParams): Sector => {
           (innerCornerRadius !== undefined ||
             outerCornerRadius !== undefined): {
           // It's an annular sector with rounded corners
-          const actualCornerInnerRadius = innerCornerRadius
-            ? Math.min((outerRadius - innerRadius) / 2, innerCornerRadius)
-            : undefined;
-          const actualCornerOuterRadius = outerCornerRadius
-            ? Math.min((outerRadius - innerRadius) / 2, outerCornerRadius)
-            : undefined;
+
+          // if (
+          //   actualCornerOuterRadius &&
+          //   (360 * (actualCornerOuterRadius / (Math.PI * outerRadius))) > Math.abs(startAngle - endAngle)
+          // ) {
+          //   actualCornerOuterRadius = (padAngle ?? 0) / 360 * outerRadius * Math.PI;
+          // }
 
           const center: Point = { x: 0, y: 0 };
           const startAnglePadded = startAngle + (padAngle ?? 0 / 2);
           const endAnglePadded = endAngle - (padAngle ?? 0 / 2);
 
+          let actualCornerInnerRadius = innerCornerRadius
+            ? Math.min((outerRadius - innerRadius) / 2, innerCornerRadius)
+            : undefined;
+          let actualCornerOuterRadius = outerCornerRadius
+            ? Math.min((outerRadius - innerRadius) / 2, outerCornerRadius)
+            : undefined;
+
+          if (
+            actualCornerInnerRadius &&
+            (360 * (actualCornerInnerRadius / (Math.PI * innerRadius))) > Math.abs(startAngle - endAngle)
+          ) {
+            actualCornerInnerRadius = (angleSpan ?? 0) / 360 * innerRadius * Math.PI;
+            actualCornerOuterRadius = (angleSpan ?? 0) / 360 * innerRadius * Math.PI;
+          }
+
           const innerRadiusIncludingBorder = innerRadius + (actualCornerInnerRadius ?? 0);
           const outerRadiusIncludingBorder = outerRadius - (actualCornerInnerRadius ?? 0);
+
           // These already take into account the border
           const outerStart = pointOnArc(center, outerRadiusIncludingBorder, startAnglePadded);
           const outerEnd = pointOnArc(center, outerRadiusIncludingBorder, endAnglePadded);
           const innerStart = pointOnArc(center, innerRadiusIncludingBorder, startAnglePadded);
           const innerEnd = pointOnArc(center, innerRadiusIncludingBorder, endAnglePadded);
 
-          const innerRoundingAngle = 360 * ((actualCornerInnerRadius ?? 0) / (2 * Math.PI * innerRadius));
+          const innerRoundingAngle = 360 *
+            ((actualCornerInnerRadius ?? 0) / (2 * Math.PI * innerRadiusIncludingBorder));
           const outerRoundingAngle = 360 * ((actualCornerOuterRadius ?? 0) / (2 * Math.PI * outerRadius));
 
           const innerArcStart = pointOnArc(center, innerRadius, startAnglePadded + innerRoundingAngle);
