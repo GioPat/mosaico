@@ -1,9 +1,11 @@
 import type { Path } from "../path/mod.ts";
 import { DEGREE_TO_RADIAN } from "./math.ts";
+import type { Point } from "./point.ts";
+import type { Primitive, PrimitiveParams } from "./mod.ts";
 
 const epsilon = 1e-12;
 
-type SectorInitParams = {
+type SectorParams = {
   startAngle: number;
   endAngle: number;
   outerRadius: number;
@@ -11,15 +13,6 @@ type SectorInitParams = {
   outerCornerRadius?: number;
   innerCornerRadius?: number;
   padAngle?: number;
-};
-
-type Sector = {
-  draw: (path: Path) => void;
-};
-
-type Point = {
-  x: number;
-  y: number;
 };
 
 /**
@@ -37,7 +30,7 @@ const pointOnArc = (center: Point, radius: number, angle: number): Point => {
   };
 };
 
-export const sector = (params: SectorInitParams): Sector => {
+export const sector = (params: PrimitiveParams & SectorParams): Primitive => {
   const {
     startAngle,
     endAngle,
@@ -50,45 +43,40 @@ export const sector = (params: SectorInitParams): Sector => {
   return {
     draw: (path: Path) => {
       const angleSpan = Math.abs(endAngle - startAngle);
+      const center = params.center ?? { x: 0, y: 0 };
       if (!innerRadius && innerCornerRadius) {
         throw new Error("innerCornerRadius requires innerRadius.");
       }
       switch (true) {
         case angleSpan > 360 - epsilon: {
           // It's a circle or annulus
-          path.circle(0, outerRadius, outerRadius * 2, true);
+          path.moveTo(center.x - outerRadius, center.y);
+          path.circle(outerRadius * 2, true);
           if (innerRadius && innerRadius > epsilon) {
             if (innerRadius > outerRadius) {
-              throw new Error(
-                `innerRadius (${innerRadius}) is greater than outerRadius (${outerRadius})`,
-              );
+              throw new Error(`innerRadius (${innerRadius}) is greater than outerRadius (${outerRadius})`);
             }
             // It's an annulus
-            path.circle(
-              outerRadius - innerRadius,
-              0,
-              innerRadius * 2,
-              false,
-            );
+            path.moveTo(center.x - innerRadius, center.y);
+            path.circle(innerRadius * 2, false);
           }
           break;
         }
         case !innerRadius && !outerCornerRadius: {
           // It's a slice with no rounded corners
-          path.moveTo(0, -outerRadius);
+          path.moveTo(center.x, center.y);
           const startAnglePadded = startAngle + (padAngle ?? 0 / 2);
           const endAnglePadded = endAngle - (padAngle ?? 0 / 2);
-          const startPoint = pointOnArc({ x: 0, y: -outerRadius }, outerRadius, startAnglePadded);
+          const startPoint = pointOnArc(center, outerRadius, startAnglePadded);
           path.lineTo(startPoint.x, startPoint.y);
           const sweep = angleSpan > 180;
           const sweepMainArc = startAngle < endAngle;
-          const endPoint = pointOnArc({ x: 0, y: -outerRadius }, outerRadius, endAnglePadded);
+          const endPoint = pointOnArc(center, outerRadius, endAnglePadded);
           path.arcRaw(outerRadius, outerRadius, 0, sweep, sweepMainArc, endPoint.x, endPoint.y);
           break;
         }
         case !innerRadius && outerCornerRadius !== undefined: {
           // It's a slice with rounded outer corners
-          const center: Point = { x: 0, y: -outerRadius };
           const actualCornerOuterRadius = Math.min(outerRadius / 2, outerCornerRadius);
           const outerRadiusIncludingBorder = outerRadius - actualCornerOuterRadius;
           const startAnglePadded = startAngle + (padAngle ?? 0 / 2);
@@ -102,7 +90,7 @@ export const sector = (params: SectorInitParams): Sector => {
           const outerEnd = pointOnArc(center, outerRadiusIncludingBorder, endAnglePadded);
 
           const outerSweep = angleSpan > 180 + 2 * outerRoundingAngle;
-          path.moveTo(0, -outerRadius);
+          path.moveTo(center.x, center.y);
           path.lineTo(outerStart.x, outerStart.y);
           path.arcRaw(
             actualCornerOuterRadius,
@@ -119,17 +107,17 @@ export const sector = (params: SectorInitParams): Sector => {
         }
         case innerRadius !== undefined && !outerCornerRadius &&
           !innerCornerRadius: {
+          // It's an annular sector with no rounded corners
           const startAnglePadded = startAngle + (padAngle ?? 0 / 2);
           const endAnglePadded = endAngle - (padAngle ?? 0 / 2);
-          // It's an annular sector with no rounded corners
-          const innerArcStart = pointOnArc({ x: 0, y: 0 }, innerRadius, startAnglePadded);
-          const outerArcStart = pointOnArc({ x: 0, y: 0 }, outerRadius, startAnglePadded);
+          const innerArcStart = pointOnArc(center, innerRadius, startAnglePadded);
+          const outerArcStart = pointOnArc(center, outerRadius, startAnglePadded);
           path.moveTo(innerArcStart.x, innerArcStart.y);
           path.lineTo(outerArcStart.x, outerArcStart.y);
           const sweep = angleSpan > 180;
-          const outerArcEnd = pointOnArc({ x: 0, y: 0 }, outerRadius, endAnglePadded);
+          const outerArcEnd = pointOnArc(center, outerRadius, endAnglePadded);
           path.arcRaw(outerRadius, outerRadius, 0, sweep, true, outerArcEnd.x, outerArcEnd.y);
-          const innerArcEnd = pointOnArc({ x: 0, y: 0 }, innerRadius, endAnglePadded);
+          const innerArcEnd = pointOnArc(center, innerRadius, endAnglePadded);
           path.lineTo(innerArcEnd.x, innerArcEnd.y);
           path.arcRaw(innerRadius, innerRadius, 0, sweep, false, innerArcStart.x, innerArcStart.y);
           break;
@@ -146,7 +134,6 @@ export const sector = (params: SectorInitParams): Sector => {
           //   actualCornerOuterRadius = (padAngle ?? 0) / 360 * outerRadius * Math.PI;
           // }
 
-          const center: Point = { x: 0, y: 0 };
           const startAnglePadded = startAngle + (padAngle ?? 0 / 2);
           const endAnglePadded = endAngle - (padAngle ?? 0 / 2);
 
@@ -162,7 +149,13 @@ export const sector = (params: SectorInitParams): Sector => {
             (360 * (actualCornerInnerRadius / (Math.PI * innerRadius))) > Math.abs(startAngle - endAngle)
           ) {
             actualCornerInnerRadius = (angleSpan ?? 0) / 360 * innerRadius * Math.PI;
-            actualCornerOuterRadius = (angleSpan ?? 0) / 360 * innerRadius * Math.PI;
+          }
+
+          if (
+            actualCornerOuterRadius &&
+            (360 * (actualCornerOuterRadius / (Math.PI * outerRadius))) > Math.abs(startAngle - endAngle)
+          ) {
+            actualCornerOuterRadius = (angleSpan ?? 0) / 360 * outerRadius * Math.PI;
           }
 
           const innerRadiusIncludingBorder = innerRadius + (actualCornerInnerRadius ?? 0);

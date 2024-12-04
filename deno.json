@@ -1,7 +1,7 @@
 {
   "workspace": [
     "./path",
-    "./shape"
+    "./primitive"
   ],
   "fmt": {
     "lineWidth": 120

@@ -99,12 +99,7 @@ export type Path = {
    * @param clockwise If true, draws the circle clockwise, otherwise counter-clockwise, this is useful for creating donut and have a correct fill behavior.
    * @returns
    */
-  circle: (
-    x: number,
-    y: number,
-    radius: number,
-    clockwise: boolean,
-  ) => void;
+  circle: (radius: number, clockwise: boolean) => void;
 
   /**
    * Adds to the path a circular arc segment with the specified center ⟨x, y⟩, radius, startAngle and endAngle. If anticlockwise is true, the arc is drawn in the anticlockwise direction; otherwise, it is drawn in the clockwise direction. If the current point is not equal to the starting point of the arc, a straight line is drawn from the current point to the start of the arc.
@@ -179,9 +174,7 @@ export const createPath = (digits?: number): Path => {
     y1: number | null = null;
   let path: string = "";
   const mul = Math.pow(10, digits ?? 0);
-  const trimDigit: (number: number) => number = digits !== undefined
-    ? (number: number) => trim(number, mul)
-    : notTrim;
+  const trimDigit: (number: number) => number = digits !== undefined ? (number: number) => trim(number, mul) : notTrim;
 
   const moveTo = (x: number, y: number): void => {
     x0 = x;
@@ -199,9 +192,7 @@ export const createPath = (digits?: number): Path => {
   ): void => {
     x1 = x;
     y1 = y;
-    path = `${path}Q${trimDigit(cpx)},${trimDigit(cpy)},${trimDigit(x1)},${
-      trimDigit(y1)
-    }`;
+    path = `${path}Q${trimDigit(cpx)},${trimDigit(cpy)},${trimDigit(x1)},${trimDigit(y1)}`;
   };
 
   const bezierCurveTo = (
@@ -214,9 +205,9 @@ export const createPath = (digits?: number): Path => {
   ): void => {
     x1 = x;
     y1 = y;
-    path = `${path}C${trimDigit(cp1x)},${trimDigit(cp1y)},${trimDigit(cp2x)},${
-      trimDigit(cp2y)
-    },${trimDigit(x1)},${trimDigit(y1)}`;
+    path = `${path}C${trimDigit(cp1x)},${trimDigit(cp1y)},${trimDigit(cp2x)},${trimDigit(cp2y)},${trimDigit(x1)},${
+      trimDigit(y1)
+    }`;
   };
 
   const arcTo = (
@@ -265,31 +256,22 @@ export const createPath = (digits?: number): Path => {
         t01 = l / l01,
         t21 = l / l21;
       if (Math.abs(t01 - 1) > epsilon) {
-        path = `${path}L${trimDigit(x1Arc + t01 * x01)} ${
-          trimDigit(y1Arc + t01 * y01)
-        }`;
+        path = `${path}L${trimDigit(x1Arc + t01 * x01)} ${trimDigit(y1Arc + t01 * y01)}`;
       }
       x1 = x1Arc + t21 * x21;
       y1 = y1Arc + t21 * y21;
-      path = `${path}A${trimDigit(r)},${
-        trimDigit(r)
-      },0,0,${+(y01 * x20 > x01 * y20)},${trimDigit(x1)},${trimDigit(y1)}`;
+      path = `${path}A${trimDigit(r)},${trimDigit(r)},0,0,${+(y01 * x20 > x01 * y20)},${trimDigit(x1)},${
+        trimDigit(y1)
+      }`;
       return;
     }
   };
 
-  // Relative circle
-  const circle = (
-    x: number,
-    y: number,
-    radius: number,
-    clockwise: boolean,
-  ): void => {
+  // Relative circle from the current point
+  const circle = (radius: number, clockwise: boolean): void => {
     const halfRadius = radius / 2;
     const cw = clockwise ? 1 : 0;
-    path = `${path}m${x} ${y} a${trimDigit(halfRadius)} ${
-      trimDigit(halfRadius)
-    } 0 0${cw}${radius} 0 ${trimDigit(halfRadius)} ${
+    path = `${path}a${trimDigit(halfRadius)} ${trimDigit(halfRadius)} 0 0${cw}${radius} 0 ${trimDigit(halfRadius)} ${
       trimDigit(halfRadius)
     } 0 0${cw}${-trimDigit(radius)} 0`;
     return;
@@ -329,17 +311,15 @@ export const createPath = (digits?: number): Path => {
     if (da > tauEpsilon) {
       x1 = x0;
       y1 = y0;
-      path = `${path}A${trimDigit(radius)},${trimDigit(radius)},0,1,${cw},${
-        trimDigit(x - dx)
-      },${trimDigit(y - dy)}A${trimDigit(radius)},${
+      path = `${path}A${trimDigit(radius)},${trimDigit(radius)},0,1,${cw},${trimDigit(x - dx)},${trimDigit(y - dy)}A${
         trimDigit(radius)
-      },0,1,${cw},${trimDigit(x1)},${trimDigit(y1)}`;
+      },${trimDigit(radius)},0,1,${cw},${trimDigit(x1)},${trimDigit(y1)}`;
     } else if (da > epsilon) {
       x1 = x + radius * Math.cos(endAngle);
       y1 = y + radius * Math.sin(endAngle);
-      path = `${path}A${trimDigit(radius)},${
-        trimDigit(radius)
-      },0,${+(da >= pi)},${cw},${trimDigit(x1)},${trimDigit(y1)}`;
+      path = `${path}A${trimDigit(radius)},${trimDigit(radius)},0,${+(da >= pi)},${cw},${trimDigit(x1)},${
+        trimDigit(y1)
+      }`;
     }
     return;
   };
@@ -356,9 +336,7 @@ export const createPath = (digits?: number): Path => {
     y0 = y;
     y1 = y;
 
-    path = `${path}M${trimDigit(x0)} ${trimDigit(y0)}h${trimDigit(w)}v${
-      trimDigit(h)
-    }h${trimDigit(-w)}Z`;
+    path = `${path}M${trimDigit(x0)} ${trimDigit(y0)}h${trimDigit(w)}v${trimDigit(h)}h${trimDigit(-w)}Z`;
     return;
   };
 
@@ -377,9 +355,7 @@ export const createPath = (digits?: number): Path => {
     const command = absolute ? "A" : "a";
     path = `${path}${command}${trimDigit(radiusX)} ${
       trimDigit(radiusY)
-    } ${xAxisRotation} ${largeArcFlagValue}${sweepFlagValue} ${trimDigit(x)} ${
-      trimDigit(y)
-    }`;
+    } ${xAxisRotation} ${largeArcFlagValue}${sweepFlagValue} ${trimDigit(x)} ${trimDigit(y)}`;
   };
 
   const closePath = (): void => {
