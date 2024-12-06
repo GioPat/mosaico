@@ -22,7 +22,7 @@
           "jsr:@std/assert@1"
         ]
       },
-      "primitive": {
+      "shape": {
         "dependencies": [
           "jsr:@std/assert@1"
         ]

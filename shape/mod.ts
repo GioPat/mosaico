@@ -1,10 +1,10 @@
 import type { Path } from "@mosaico/path";
 import type { Point } from "./point.ts";
 
-export type Primitive = {
+export type Shape = {
   draw: (path: Path) => void;
 };
 
-export type PrimitiveParams = {
+export type ShapeParams = {
   center?: Point;
 };

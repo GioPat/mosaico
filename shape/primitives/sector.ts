@@ -1,17 +1,27 @@
-import type { Path } from "../path/mod.ts";
-import { DEGREE_TO_RADIAN } from "./math.ts";
-import type { Point } from "./point.ts";
-import type { Primitive, PrimitiveParams } from "./mod.ts";
+import type { Path } from "@mosaico/path";
+import { DEGREE_TO_RADIAN } from "../math.ts";
+import type { Point } from "../point.ts";
+import type { Shape, ShapeParams } from "../mod.ts";
 
 const epsilon = 1e-12;
 
+/**
+ * Type definition for the parameters of a sector.
+ */
 type SectorParams = {
+  /** Start angle of the slice */
   startAngle: number;
+  /** End angle of the slice */
   endAngle: number;
+  /** Outer radius of the sector */
   outerRadius: number;
+  /** Inner radius of the sector */
   innerRadius?: number;
+  /** Outer corner radius of the sector */
   outerCornerRadius?: number;
+  /** Inner corner radius of the sector */
   innerCornerRadius?: number;
+  /** Padding angle of the sector applied on the start and end angle of the sector */
   padAngle?: number;
 };
 
@@ -30,7 +40,7 @@ const pointOnArc = (center: Point, radius: number, angle: number): Point => {
   };
 };
 
-export const sector = (params: PrimitiveParams & SectorParams): Primitive => {
+export const sector = (params: ShapeParams & SectorParams): Shape => {
   const {
     startAngle,
     endAngle,

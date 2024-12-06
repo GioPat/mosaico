@@ -1,6 +1,7 @@
 import { createPath } from "../path/mod.ts";
 import { area } from "./area.ts";
-import { sector } from "./sector.ts";
+import { sector } from "./primitives./sector.ts";
+import { rectangle } from "./primitives/rectangle.ts";
 import { assertEquals } from "@std/assert";
 
 Deno.test(function circle() {
@@ -21,9 +22,11 @@ Deno.test(function circle() {
 
 const testArea = () => {
   const path = createPath(3);
-  const a = area({
-    startingPoints: [{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }],
-    endingPoints: [{ x: 100, y: -351 }, { x: 300, y: -400 }, { x: 300, y: -400 }],
+  const a = rectangle({
+    width: 200,
+    height: 100,
+    bottomRadius: 10,
+    topRadius: 4,
   });
   a.draw(path);
   console.log(path.toString());
